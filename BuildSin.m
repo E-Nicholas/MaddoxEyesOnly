@@ -11,11 +11,12 @@ function [tvec, wav] = BuildSin(f,fs,timelength,amp)
 %
 % example: [x,y] = BuildSin(10,1000,1,0.5)
 % will return 1 second of a 10Hz sin wave at 1kH sampling rate
-% with x being the time vector and y carrying the desired signal
+% with x being the time vector with units of seconds
+% and y carrying the desired signal
 % Eric Nicholas 2017
-dt = 1000/fs;
+dt = 1/fs;
 
-tvec = dt:dt:timelength*1000;
-wav = amp*sin(2 * pi * f/fs * tvec);
+tvec = dt:dt:timelength;
+wav = amp*sin(2 * pi * f/fs * tvec * 1000);
 
 end
