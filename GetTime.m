@@ -5,11 +5,11 @@ function tvec = GetTime(fs,time,varargin)
 % If additional inputs are given they will be processed as follows,
 % tvec = GetTime(fs,prezero,postzero,units)
 % 
-    dt = 1000/fs;
+    dt = 1/fs;
 if isempty(varargin)
-    tvec = dt:dt:time*1000;
+    tvec = dt:dt:time;
 else
-    tvec = -abs(time)*1000:dt:varargin{1}*1000;
+    tvec = -abs(time):dt:varargin{1};
 end
 
 end
