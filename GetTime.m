@@ -4,7 +4,7 @@ function tvec = GetTime(fs,time,varargin)
 % If only fs and a length are given returns from t(dt) to t(time).
 % If additional inputs are given they will be processed as follows,
 % tvec = GetTime(fs,prezero,postzero,units)
-% 
+% UNITS FUNCTIONALITY YET TO BE ADDED
     dt = 1/fs;
 if isempty(varargin)
     tvec = dt:dt:time;
