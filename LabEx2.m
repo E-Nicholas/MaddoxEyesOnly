@@ -110,20 +110,144 @@ tmax = .02;
 [tvec, epoch_prebase] = BMEepoch(raw,events,fs,tmin,tmax);
 
 trange = [-0.05 0];
-epoch = BMEbaseline(epoch_prebase,tvec,trange);
+epoch = BMEbaseline(epoch_prebase,tvec,trange); %Baseline correction, because baselines crave discipline
 
 event_mean = mean(epoch,3);
-mean_scaled = event_mean .* 10^6;
-
+mean_scaled = event_mean .* 10^6; %Scale to a reasonable unit
 tvec = GetTime(fs,tmin,tmax,3); % Get a new time vector with units in ms for plotting
+
+%PlotIt
 figure('Color',[1 1 1],'NumberTitle','off','Name','Average ABR Response','Position',scrz); 
 plot(tvec,mean_scaled,'LineWidth',1.5); hold on;
 plot(tvec,zeros(length(tvec)),'--','color',[0.6 0.6 0.6]);
+%Annotations
+text(1.95,0.17,'I','FontSize',18,'Color',[0 0.4 0.8]);
+text(2.9,0.08,'II','FontSize',18,'Color',[0 0.4 0.8]);
+text(4,0.15,'III','FontSize',18,'Color',[0 0.4 0.8]);
+text(6,0.61,'V','FontSize',18,'Color',[0 0.4 0.8]);
+text(8.4,0.3,'VI','FontSize',18,'Color',[0 0.4 0.8]);
+text(3.8,0.32,'III','FontSize',18,'Color',[0.8 0.4 0]);
+text(5.1,0.6,'IV','FontSize',18,'Color',[0.8 0.4 0]);
+text(6.2,0.92,'V','FontSize',18,'Color',[0.8 0.4 0]);
+text(8.4,0.45,'VI','FontSize',18,'Color',[0.8 0.4 0]);
+%Finishing Touhces
 set(gca,'xlim',[-5 10]);
 ys = get(gca,'ylim');
 plot([0 0],ys,'k--');
 set(gca,'ylim',ys,'XTick',-5:1:10);
 ylabel('Voltage (\muV)'); xlabel('Time (ms)');
 legend('Left Ear Click','Right Ear Click','Location','northeast');
+title('Mean ABR - Left vs Right Ear');
 
+%% Plotting signal and noise and estimating SNR
+% This cell relies on variables declared in the previous cell, please
+% evaluate the previous cell.
+%
+% Question #1. Yes, it seems the signal is larger than the noise.
+%
+% Even vs Odd trial splitting
+odd_idx = find(mod(1:1:length(epoch),2) == 1);
+even_idx = find(mod(1:1:length(epoch),2) == 0);
+odd_mean = mean(epoch(:,1,odd_idx),3).* 10^6;
+even_mean = mean(epoch(:,1,even_idx),3).* 10^6;
+
+oddeven_mean = mean(odd_mean+even_mean,2);
+oddeven_noise = mean((odd_mean)+(-1.*even_mean),2);
+%
+% First half vs second hald splitting
+first_half_idx = 1:1:floor(length(epoch)/2);
+second_half_idx = first_half_idx(end):1:length(epoch);
+first_half_mean = mean(epoch(:,1,first_half_idx),3).* 10^6;
+second_half_mean = mean(epoch(:,1,second_half_idx),3).* 10^6;
+
+halves_mean = mean(first_half_mean+second_half_mean,2);
+halves_noise = mean((first_half_mean)+(-1.*second_half_mean),2);
+%
+% Random split of trials
+rand_idx = randperm(length(epoch));
+rand_first_idx = rand_idx(1:1:floor(length(epoch)/2));
+rand_second_idx = rand_idx(length(rand_first_idx)+1:1:length(rand_idx));
+rand_first_mean = mean(epoch(:,1,rand_first_idx),3).* 10^6;
+rand_second_mean = mean(epoch(:,1,rand_second_idx),3).* 10^6;
+
+rand_mean = mean(rand_first_mean+rand_second_mean,2);
+rand_noise = mean((rand_first_mean)+(-1.*rand_second_mean),2);
+%
+%PlotIt Even vs Odd Trials
+figure('Color',[1 1 1],'NumberTitle','off','Name','Odds vs Evens','Position',scrz)
+subplot(2,1,1)
+plot(tvec,odd_mean); hold on; plot(tvec,even_mean)
+plot(tvec,zeros(length(tvec)),'--','color',[0.6 0.6 0.6]);
+ys = get(gca,'ylim');
+plot([0 0],ys,'k--');
+ylabel('Voltage (\muV)'); xlabel('Time (ms)');
+legend('Odd Trials','Even Trials','Location','northeast');
+title('Signal and Noise - Odd vs Even Trials');
+subplot(2,1,2)
+plot(tvec,oddeven_mean,'color',[0.8 0.4 0.6]); hold on; plot(tvec,oddeven_noise,'color',[0.2 0.8 0.2]);
+plot(tvec,zeros(length(tvec)),'--','color',[0.6 0.6 0.6]);
+ys = get(gca,'ylim');
+plot([0 0],ys,'k--');
+ylabel('Voltage (\muV)'); xlabel('Time (ms)');
+legend('Signal+Noise','Noise Estimate','Location','northeast');
+%Qualitatively poor separation bewtween signal and noise, particularly
+%between t = 2-10 ms
+%
+%PlotIt First Half vs Second Half of trials
+figure('Color',[1 1 1],'NumberTitle','off','Name','First Half vs Second Half','Position',scrz)
+subplot(2,1,1)
+plot(tvec,first_half_mean); hold on; plot(tvec,second_half_mean)
+plot(tvec,zeros(length(tvec)),'--','color',[0.6 0.6 0.6]);
+ys = get(gca,'ylim');
+plot([0 0],ys,'k--');
+ylabel('Voltage (\muV)'); xlabel('Time (ms)');
+legend('First Half Trials','Second Half Trials','Location','northeast');
+title('Signal and Noise - First Half vs Second Half Trials');
+subplot(2,1,2)
+plot(tvec,halves_mean,'color',[0.8 0.4 0.6]); hold on; plot(tvec,halves_noise,'color',[0.2 0.8 0.2]);
+plot(tvec,zeros(length(tvec)),'--','color',[0.6 0.6 0.6]);
+ys = get(gca,'ylim');
+plot([0 0],ys,'k--');
+ylabel('Voltage (\muV)'); xlabel('Time (ms)');
+legend('Signal+Noise','Noise Estimate','Location','northeast');
+%Qualitatively reasonable separation between signal and noise
+%
+%Plotit Trials Randomly split in half
+figure('Color',[1 1 1],'NumberTitle','off','Name','Rand First Half vs Rand Second Half','Position',scrz)
+subplot(2,1,1)
+plot(tvec,rand_first_mean); hold on; plot(tvec,rand_second_mean)
+plot(tvec,zeros(length(tvec)),'--','color',[0.6 0.6 0.6]);
+ys = get(gca,'ylim');
+plot([0 0],ys,'k--');
+ylabel('Voltage (\muV)'); xlabel('Time (ms)');
+title('Signal and Noise - Random 1/2 vs Remaining 1/2 of Trials');
+legend('Random Trials','Remaining Trials','Location','northeast');
+subplot(2,1,2)
+plot(tvec,rand_mean,'color',[0.8 0.4 0.6]); hold on; plot(tvec,rand_noise,'color',[0.2 0.8 0.2]);
+plot(tvec,zeros(length(tvec)),'--','color',[0.6 0.6 0.6]);
+ys = get(gca,'ylim');
+plot([0 0],ys,'k--');
+ylabel('Voltage (\muV)'); xlabel('Time (ms)');
+legend('Signal+Noise','Noise Estimate','Location','northeast');
+%Looks like a good separation of signal and noise, looking at t < 0 gives
+%particular confidence as the noise is fairly low through this period
+
+
+%Question #5, estimation of SNR of left-ear responses using three trial
+%splitting methods
+evenodd_SNR = (MeanSq(oddeven_mean,2)-MeanSq(oddeven_noise,2))/MeanSq(oddeven_noise,2)
+
+halves_SNR = (MeanSq(halves_mean,2)-MeanSq(halves_noise,2))/MeanSq(halves_noise,2)
+
+random_SNR = (MeanSq(rand_mean,2)-MeanSq(rand_noise,2))/MeanSq(rand_noise,2)
+
+%Question #6, The Even odd split is substantially worse than taking random
+%trials, or splitting the trials in half based on their temporal order.
+%This is because, I'm speculating but have ideas to show, there was a
+%somewhat non-random to the trial order. I would like to generate a plot
+%showing the probability of repeated same-ear clicks in the even and odd
+%trial distributions.
+
+
+%% Plotting means with error estimates
 
