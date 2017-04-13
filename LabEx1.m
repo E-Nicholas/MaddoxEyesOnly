@@ -1,7 +1,7 @@
 %BME 425 Laboratory exercise 1 - Eric Nicholas
 
 %reminder: quickly evaluate the selected cell with ctrl-Enter
-clearvars
+clear;
 
 %% Cell 1 - Generating signals - 15Hz...
 l = 0.2;   %Time vector from 0-200ms
@@ -24,7 +24,7 @@ f = 25;   %25 Hz signal
 l = 1;    %1 second of signal
 amp = 1;  %peak amplitude = 1
 
-[tvec, wav] = BuildSin(f,fs,l,amp); %ah yis
+[tvec, wav] = BuildSin(f,fs,l,amp); 
 
 fsdown = [100 50 30 25 20]; %desired sampling rates for decimted and resampled signals
 takeevery = fs./fsdown;         %points to take in decimated signals
