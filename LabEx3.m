@@ -16,7 +16,7 @@ amp = 1;
 
 tvec = GetTime(fs,tmax);
 
-wav = amp*cos(2 * pi * f/fs * tvec * 1000);
+wav = amp*cos(2 * pi * f * tvec);
 gaussnoise = normrnd(0,1,1,length(tvec));
 noisy_wav = gaussnoise + wav;
 
