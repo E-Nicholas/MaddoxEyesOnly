@@ -161,7 +161,7 @@ oddeven_noise = mean([odd_mean (-1.*even_mean)],2);
 %
 % First half vs second hald splitting
 first_half_idx = 1:1:floor(length(epoch)/2);
-second_half_idx = first_half_idx(end):1:length(epoch);
+second_half_idx = first_half_idx(end)+1:1:length(epoch);
 first_half_mean = mean(epoch(:,1,first_half_idx),3).* 10^6;
 second_half_mean = mean(epoch(:,1,second_half_idx),3).* 10^6;
 
@@ -182,9 +182,7 @@ rand_noise = mean([rand_first_mean (-1.*rand_second_mean)],2);
 %Question #5, estimation of SNR of left-ear responses using three trial
 %splitting methods
 evenodd_SNR = 10*log10((MeanSq(oddeven_splusn,2)-MeanSq(oddeven_noise,2))/MeanSq(oddeven_noise,2))
-
 halves_SNR = 10*log10((MeanSq(halves_splusn,2)-MeanSq(halves_noise,2))/MeanSq(halves_noise,2))
-
 random_SNR = 10*log10((MeanSq(rand_splusn,2)-MeanSq(rand_noise,2))/MeanSq(rand_noise,2))
 
 %Plot Even vs Odd Trials
