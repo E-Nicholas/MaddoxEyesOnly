@@ -98,8 +98,8 @@ end
 %sequences with 4 repeated right-ear-clicks. Event 1 (left ear) has far more repeats of 2, and
 %repeats of 6 consecutive clicks to the left ear.
 figure('Color',[1 1 1],'NumberTitle','off','Name','Number of repeated event sequences','Position',scrz);
-bar3([nones_reps' ntwos_reps']);
-ylabel('Number of Repeats'); xlabel('Event Type'); zlabel('Numer of Sequences');
+bar([nones_reps' ntwos_reps']);
+ylabel('Numer of Sequences'); xlabel('Number of Repeats');
 legend('Left Ear Click','Right Ear Click','Location','northeast');
 
 %% Staring With Epoching... now the epoching
@@ -165,7 +165,7 @@ second_half_idx = first_half_idx(end):1:length(epoch);
 first_half_mean = mean(epoch(:,1,first_half_idx),3).* 10^6;
 second_half_mean = mean(epoch(:,1,second_half_idx),3).* 10^6;
 
-halves_mean = mean([first_half_mean second_half_mean],2);
+halves_splusn = mean([first_half_mean second_half_mean],2);
 halves_noise = mean([first_half_mean (-1.*second_half_mean)],2);
 %
 % Random split of trials
@@ -175,7 +175,7 @@ rand_second_idx = rand_idx(length(rand_first_idx)+1:1:length(rand_idx));
 rand_first_mean = mean(epoch(:,1,rand_first_idx),3).* 10^6;
 rand_second_mean = mean(epoch(:,1,rand_second_idx),3).* 10^6;
 
-rand_mean = mean([rand_first_mean rand_second_mean],2);
+rand_splusn = mean([rand_first_mean rand_second_mean],2);
 rand_noise = mean([rand_first_mean (-1.*rand_second_mean)],2);
 %
 
@@ -183,9 +183,9 @@ rand_noise = mean([rand_first_mean (-1.*rand_second_mean)],2);
 %splitting methods
 evenodd_SNR = 10*log10((MeanSq(oddeven_splusn,2)-MeanSq(oddeven_noise,2))/MeanSq(oddeven_noise,2))
 
-halves_SNR = 10*log10((MeanSq(halves_mean,2)-MeanSq(halves_noise,2))/MeanSq(halves_noise,2))
+halves_SNR = 10*log10((MeanSq(halves_splusn,2)-MeanSq(halves_noise,2))/MeanSq(halves_noise,2))
 
-random_SNR = 10*log10((MeanSq(rand_mean,2)-MeanSq(rand_noise,2))/MeanSq(rand_noise,2))
+random_SNR = 10*log10((MeanSq(rand_splusn,2)-MeanSq(rand_noise,2))/MeanSq(rand_noise,2))
 
 %Plot Even vs Odd Trials
 figure('Color',[1 1 1],'NumberTitle','off','Name','Odds vs Evens','Position',scrz)
@@ -219,7 +219,7 @@ ylabel('Voltage (\muV)'); xlabel('Time (ms)');
 legend('First Half Trials','Second Half Trials','Location','northeast');
 title('Signal and Noise - First Half vs Second Half Trials');
 subplot(2,1,2)
-plot(tvec,halves_mean,'color',[0.8 0.4 0.6]); hold on; plot(tvec,halves_noise,'color',[0.2 0.8 0.2]);
+plot(tvec,halves_splusn,'color',[0.8 0.4 0.6]); hold on; plot(tvec,halves_noise,'color',[0.2 0.8 0.2]);
 plot(tvec,zeros(length(tvec)),'--','color',[0.6 0.6 0.6]);
 text(5,-1,['SNR = ' num2str(halves_SNR)],'FontSize',14);
 ys = get(gca,'ylim');
@@ -239,7 +239,7 @@ ylabel('Voltage (\muV)'); xlabel('Time (ms)');
 title('Signal and Noise - Random 1/2 vs Remaining 1/2 of Trials');
 legend('Random Trials','Remaining Trials','Location','northeast');
 subplot(2,1,2)
-plot(tvec,rand_mean,'color',[0.8 0.4 0.6]); hold on; plot(tvec,rand_noise,'color',[0.2 0.8 0.2]);
+plot(tvec,rand_splusn,'color',[0.8 0.4 0.6]); hold on; plot(tvec,rand_noise,'color',[0.2 0.8 0.2]);
 plot(tvec,zeros(length(tvec)),'--','color',[0.6 0.6 0.6]);
 text(5,-1,['SNR = ' num2str(random_SNR)],'FontSize',14);
 ys = get(gca,'ylim');
