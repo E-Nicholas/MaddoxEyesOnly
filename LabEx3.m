@@ -34,3 +34,23 @@ title('150Hz Cosine wave with Guassian Noise');
 subplot(2,1,2);
 plot(fvec,P2);
 title('Discrete Fourier Transform');
+
+
+%% Numerical precision of the FFT
+
+%generate a vector of random vlues
+x = rand(500,1);
+
+x(1:10)
+
+x_dft = fft(x);
+
+x_idft = ifft(x_dft);
+
+x_idft(1:10)
+
+length(find(x == x_idft))
+
+%%
+
+
