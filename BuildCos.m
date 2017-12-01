@@ -1,4 +1,4 @@
-function [tvec, wav] = BuildSin(f,fs,timelength,amp)
+function [tvec, wav] = BuildCos(f,fs,timelength,amp)
 % BuildSin will build a sin wave with the specified input parameters
 % and return a time vector (tvec) and signal (wav)
 %
@@ -17,6 +17,6 @@ function [tvec, wav] = BuildSin(f,fs,timelength,amp)
 dt = 1/fs;
 
 tvec = dt:dt:timelength;
-wav = amp*sin(2 * pi * f/fs * tvec * fs);
+wav = amp*cos(2 * pi * f/fs * tvec * fs);
 
 end
